@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>卡片分享</title>
+    <meta charset="UTF-8" />
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  </head>
+  <body>
+    <h3>正在準備分享...</h3>
+    <script>
+      async function main() {
+        await liff.init({ liffId: "你的 LIFF ID" });
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get("msg") || "這是預設分享內容";
+
+        if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([
+            {
+              type: "text",
+              text: msg
+            }
+          ]);
+          liff.closeWindow();
+        } else {
+          alert("不支援分享功能");
+        }
+      }
+      main();
+    </script>
+  </body>
+</html>
