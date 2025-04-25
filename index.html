@@ -1,31 +1,79 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>卡片分享</title>
-    <meta charset="UTF-8" />
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  </head>
-  <body>
-    <h3>正在準備分享...</h3>
-    <script>
-      async function main() {
-        await liff.init({ liffId: "2007303884-g2wdGNQ4" });
-        const urlParams = new URLSearchParams(window.location.search);
-        const msg = urlParams.get("msg") || "這是預設分享內容";
+<head>
+  <title>卡片分享</title>
+  <meta charset="UTF-8" />
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h3>正在準備分享卡片...</h3>
+  <script>
+    async function main() {
+      await liff.init({ liffId: "2007303884-g2wdGNQ4" });
 
-        if (liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([
-            {
-              type: "text",
-              text: msg
-            }
-          ]);
-          liff.closeWindow();
-        } else {
-          alert("不支援分享功能");
-        }
+      const urlParams = new URLSearchParams(window.location.search);
+      const filename = urlParams.get("filename");
+      const filesize = urlParams.get("filesize");
+      const deadline = urlParams.get("deadline");
+      const fileurl = urlParams.get("url");
+
+      if (!filename || !filesize || !deadline || !fileurl) {
+        alert("缺少必要參數，請從機器人分享按鈕點進來");
+        window.close();
+        return;
       }
-      main();
-    </script>
-  </body>
+
+      const flexMsg = {
+        type: "flex",
+        altText: "GigaFile 影片",
+        contents: {
+          type: "bubble",
+          hero: {
+            type: "image",
+            url: "https://i.imgur.com/suPTpBm.jpeg",
+            size: "full",
+            aspectRatio: "16:9",
+            aspectMode: "cover"
+          },
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            contents: [
+              { type: "text", text: filename, weight: "bold", size: "md", wrap: true },
+              { type: "text", text: "大小：" + filesize, size: "sm", color: "#666666", wrap: true },
+              { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#666666", wrap: true }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                height: "sm",
+                action: {
+                  type: "uri",
+                  label: "點進網頁",
+                  uri: fileurl
+                }
+              }
+            ],
+            flex: 0
+          }
+        }
+      };
+
+      if (liff.isApiAvailable("shareTargetPicker")) {
+        await liff.shareTargetPicker([flexMsg]);
+        liff.closeWindow();
+      } else {
+        alert("不支援分享功能");
+      }
+    }
+    main();
+  </script>
+</body>
 </html>
