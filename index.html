@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>卡片分享</title>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <h3>正在準備分享...</h3>
+  <h3>正在準備分享卡片...</h3>
   <script>
     async function main() {
       await liff.init({ liffId: "2007303884-g2wdGNQ4" });
@@ -18,7 +18,7 @@
       const fileurl = urlParams.get("url");
 
       if (!filename || !filesize || !deadline || !fileurl) {
-        alert("缺少必要參數，請從機器人分享按鈕點進來");
+        alert("缺少參數，請從機器人點分享按鈕進來");
         window.close();
         return;
       }
@@ -30,7 +30,7 @@
           type: "bubble",
           hero: {
             type: "image",
-            url: "https://i.imgur.com/suPTpBm.jpeg",  // 你固定的封面圖
+            url: "https://i.imgur.com/suPTpBm.jpeg",
             size: "full",
             aspectRatio: "16:9",
             aspectMode: "cover"
@@ -65,9 +65,9 @@
           },
           footer: {
             type: "box",
-            layout: "vertical",
-            spacing: "sm",
-            contents: [
+            "layout": "vertical",
+            "spacing": "sm",
+            "contents": [
               {
                 type: "button",
                 style: "primary",
@@ -77,9 +77,19 @@
                   label: "點進網頁",
                   uri: fileurl
                 }
+              },
+              {
+                type: "button",
+                style: "secondary",
+                height: "sm",
+                action: {
+                  type: "uri",
+                  label: "分享給親友",
+                  uri: liff.permanentLink.createUrl()
+                }
               }
             ],
-            flex: 0
+            "flex": 0
           }
         }
       };
@@ -88,10 +98,9 @@
         await liff.shareTargetPicker([flexMsg]);
         liff.closeWindow();
       } else {
-        alert('不支援分享功能');
+        alert("此裝置不支援分享功能");
       }
     }
-
     main();
   </script>
 </body>
