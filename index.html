@@ -22,8 +22,8 @@
 
       let flexMsg = null;
 
+      // ------------------------ GigaFile分享系統 ------------------------
       if (type === "gigafile") {
-        // ======= GigaFile 分享卡片 =======
         const filename = urlParams.get("filename");
         const filesize = urlParams.get("filesize");
         const deadline = urlParams.get("deadline");
@@ -105,9 +105,9 @@
             }
           }
         };
-
-      } else if (type === "gift") {
-        // ======= 例子：禮物分享卡片 =======
+      }
+      // ------------------------ 以後新增別的分享系統（範例） ------------------------
+      else if (type === "gift") {
         const title = urlParams.get("title") || "神秘禮物";
         const img = urlParams.get("img") || "https://i.imgur.com/your_default_image.jpg";
 
@@ -138,13 +138,15 @@
             }
           }
         };
-
-      } else {
+      }
+      // ------------------------ 沒有對應的分享類型 ------------------------
+      else {
         alert("未知的分享類型！");
         window.close();
         return;
       }
 
+      // ------------------------ 分享卡片 ------------------------
       if (liff.isApiAvailable('shareTargetPicker') && flexMsg) {
         await liff.shareTargetPicker([flexMsg]);
         liff.closeWindow();
