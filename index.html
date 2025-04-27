@@ -9,7 +9,7 @@
   <h3>正在準備分享卡片...</h3>
   <script>
     async function main() {
-      await liff.init({ liffId: "https://liff.line.me/2007303884-g2wdGNQ4" });
+      await liff.init({ liffId: "你的LIFF ID" });
 
       const urlParams = new URLSearchParams(window.location.search);
       const type = urlParams.get("type");
@@ -30,7 +30,7 @@
 
         flexMsg = {
           type: "flex",
-          altText: "GigaFile 影片",
+          altText: "GigaFile 影片分享",
           contents: {
             type: "bubble",
             hero: {
@@ -71,7 +71,7 @@
                   height: "sm",
                   action: {
                     type: "uri",
-                    label: "分享",
+                    label: "分享影片",
                     uri: liff.permanentLink.createUrl()
                   }
                 }
