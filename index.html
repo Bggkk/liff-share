@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>卡片分享中心</title>
+  <title>卡片分享</title>
   <meta charset="UTF-8">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
@@ -15,7 +15,7 @@
       const type = urlParams.get("type");
 
       if (!type) {
-        alert("缺少參數");
+        alert("缺少類型參數！");
         window.close();
         return;
       }
@@ -23,6 +23,7 @@
       let flexMsg = null;
 
       if (type === "gigafile") {
+        // GigaFile分享邏輯
         const filename = urlParams.get("filename") || "未知";
         const filesize = urlParams.get("filesize") || "未知";
         const deadline = urlParams.get("deadline") || "未知";
@@ -30,7 +31,7 @@
 
         flexMsg = {
           type: "flex",
-          altText: "GigaFile 影片分享",
+          altText: "GigaFile 影片",
           contents: {
             type: "bubble",
             hero: {
@@ -71,7 +72,7 @@
                   height: "sm",
                   action: {
                     type: "uri",
-                    label: "分享影片",
+                    label: "分享",
                     uri: liff.permanentLink.createUrl()
                   }
                 }
@@ -83,15 +84,23 @@
       }
 
       else if (type === "gas") {
+        // 油價分享邏輯
         const update = urlParams.get("update") || "未知";
         const time = urlParams.get("time") || "未知";
         const change = urlParams.get("change") || "無資料";
+        const p92 = urlParams.get("p92") || "N/A";
+        const p95 = urlParams.get("p95") || "N/A";
+        const p98 = urlParams.get("p98") || "N/A";
+        const alcohol = urlParams.get("alcohol") || "N/A";
+        const diesel = urlParams.get("diesel") || "N/A";
+        const gas = urlParams.get("gas") || "N/A";
 
         flexMsg = {
           type: "flex",
           altText: "油價資訊分享",
           contents: {
             type: "bubble",
+            size: "mega",
             body: {
               type: "box",
               layout: "vertical",
@@ -100,7 +109,22 @@
                 { type: "text", text: "【油價資訊】", weight: "bold", size: "xl", margin: "md" },
                 { type: "text", text: `公告日期：${update}`, size: "sm", color: "#888888" },
                 { type: "text", text: `更新時間：${time}`, size: "sm", color: "#888888" },
-                { type: "text", text: `調整幅度：${change}`, size: "sm", color: "#d0021b" }
+                { type: "text", text: `調整幅度：${change}`, size: "sm", color: "#d0021b" },
+                { type: "separator", margin: "md" },
+                {
+                  type: "box",
+                  layout: "vertical",
+                  spacing: "sm",
+                  margin: "md",
+                  contents: [
+                    { type: "text", text: `92無鉛：${p92} 元`, size: "md" },
+                    { type: "text", text: `95無鉛：${p95} 元`, size: "md" },
+                    { type: "text", text: `98無鉛：${p98} 元`, size: "md" },
+                    { type: "text", text: `酒精汽油：${alcohol} 元`, size: "md" },
+                    { type: "text", text: `超級柴油：${diesel} 元`, size: "md" },
+                    { type: "text", text: `液化石油氣：${gas} 元`, size: "md" }
+                  ]
+                }
               ]
             },
             footer: {
@@ -125,13 +149,11 @@
         };
       }
 
-      if (flexMsg) {
-        if (liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flexMsg]);
-          liff.closeWindow();
-        } else {
-          alert("此裝置不支援分享功能");
-        }
+      if (liff.isApiAvailable('shareTargetPicker')) {
+        await liff.shareTargetPicker([flexMsg]);
+        liff.closeWindow();
+      } else {
+        alert("此裝置不支援分享功能");
       }
     }
     main();
