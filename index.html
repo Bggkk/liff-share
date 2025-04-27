@@ -151,7 +151,8 @@ else if (type === "gas") {
     const diesel = urlParams.get("diesel") || "N/A";
     const gas = urlParams.get("gas") || "N/A";
 
-    const shareUrl = liff.permanentLink.createUrl();  // 建立自己的 LIFF 分享網址
+    // 分享網址，自己組完整
+    const shareUrl = `https://liff.line.me/你的liffid?type=gas&update=${encodeURIComponent(update)}&time=${encodeURIComponent(time)}&change=${encodeURIComponent(change)}&p92=${encodeURIComponent(p92)}&p95=${encodeURIComponent(p95)}&p98=${encodeURIComponent(p98)}&alcohol=${encodeURIComponent(alcohol)}&diesel=${encodeURIComponent(diesel)}&gas=${encodeURIComponent(gas)}`;
 
     flexMsg = {
         type: "flex",
