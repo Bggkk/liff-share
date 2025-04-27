@@ -107,71 +107,7 @@
         };
       }
       // ------------------------ 以後新增別的分享系統（範例） ------------------------
-else if (type === "gas") {
-    const update = urlParams.get("update") || "未知";
-    const time = urlParams.get("time") || "未知";
-    const change = urlParams.get("change") || "無資料";
-    const p92 = urlParams.get("p92") || "N/A";
-    const p95 = urlParams.get("p95") || "N/A";
-    const p98 = urlParams.get("p98") || "N/A";
-    const alcohol = urlParams.get("alcohol") || "N/A";
-    const diesel = urlParams.get("diesel") || "N/A";
-    const gas = urlParams.get("gas") || "N/A";
 
-    // 這裡組長網址
-    const longUrl = `https://liff.line.me/你的liffid?type=gas&update=${encodeURIComponent(update)}&time=${encodeURIComponent(time)}&change=${encodeURIComponent(change)}&p92=${encodeURIComponent(p92)}&p95=${encodeURIComponent(p95)}&p98=${encodeURIComponent(p98)}&alcohol=${encodeURIComponent(alcohol)}&diesel=${encodeURIComponent(diesel)}&gas=${encodeURIComponent(gas)}`;
-
-    // 這裡用 TinyURL API 轉成短網址
-    const tinyUrl = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)`)
-        .then(res => res.text())
-        .catch(() => longUrl); // 如果失敗就用原網址
-
-    flexMsg = {
-        type: "flex",
-        altText: "油價資訊分享",
-        contents: {
-            type: "bubble",
-            size: "mega",
-            body: {
-                type: "box",
-                layout: "vertical",
-                spacing: "sm",
-                contents: [
-                    { type: "text", text: "【油價資訊】", weight: "bold", size: "xl", margin: "md" },
-                    { type: "text", text: `公告日期：${update}`, size: "sm", color: "#888888" },
-                    { type: "text", text: `更新時間：${time}`, size: "sm", color: "#888888" },
-                    { type: "text", text: `調整幅度：${change}`, size: "sm", color: "#d0021b" },
-                    { type: "separator", margin: "md" },
-                    {
-                        type: "box",
-                        layout: "vertical",
-                        spacing: "sm",
-                        margin: "md",
-                        contents: [
-                            { type: "text", text: `92無鉛：${p92} 元`, size: "md" },
-                            { type: "text", text: `95無鉛：${p95} 元`, size: "md" },
-                            { type: "text", text: `98無鉛：${p98} 元`, size: "md" },
-                            { type: "text", text: `酒精汽油：${alcohol} 元`, size: "md" },
-                            { type: "text", text: `超級柴油：${diesel} 元`, size: "md" },
-                            { type: "text", text: `液化石油氣：${gas} 元`, size: "md" }
-                        ]
-                    },
-                    { type: "separator", margin: "md" },
-                    {
-                        type: "button",
-                        style: "primary",
-                        height: "sm",
-                        action: {
-                            type: "uri",
-                            label: "分享油價卡片",
-                            uri: tinyUrl
-                        }
-                    }
-                ]
-            }
-        }
-    };
-} 
       // ------------------------ 分享卡片 ------------------------
       if (liff.isApiAvailable('shareTargetPicker') && flexMsg) {
         await liff.shareTargetPicker([flexMsg]);
