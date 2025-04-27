@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>卡片分享</title>
+  <title>卡片分享中心</title>
   <meta charset="UTF-8">
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
@@ -9,13 +9,13 @@
   <h3>正在準備分享卡片...</h3>
   <script>
     async function main() {
-      await liff.init({ liffId: "你的liffid" });
+      await liff.init({ liffId: "2007303884-g2wdGNQ4" });
 
       const urlParams = new URLSearchParams(window.location.search);
       const type = urlParams.get("type");
 
       if (!type) {
-        alert("缺少類型參數！");
+        alert("缺少類型參數，請從機器人按正確的分享按鈕進來");
         window.close();
         return;
       }
@@ -23,11 +23,17 @@
       let flexMsg = null;
 
       if (type === "gigafile") {
-        // GigaFile分享邏輯
-        const filename = urlParams.get("filename") || "未知";
-        const filesize = urlParams.get("filesize") || "未知";
-        const deadline = urlParams.get("deadline") || "未知";
-        const fileurl = urlParams.get("url") || "#";
+        // ======= GigaFile 分享卡片 =======
+        const filename = urlParams.get("filename");
+        const filesize = urlParams.get("filesize");
+        const deadline = urlParams.get("deadline");
+        const fileurl = urlParams.get("url");
+
+        if (!filename || !filesize || !deadline || !fileurl) {
+          alert("缺少GigaFile參數，請從正確按鈕進來");
+          window.close();
+          return;
+        }
 
         flexMsg = {
           type: "flex",
@@ -46,9 +52,27 @@
               layout: "vertical",
               spacing: "sm",
               contents: [
-                { type: "text", text: filename, weight: "bold", size: "md", wrap: true },
-                { type: "text", text: "大小：" + filesize, size: "sm", color: "#666666", wrap: true },
-                { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#666666", wrap: true }
+                {
+                  type: "text",
+                  text: filename,
+                  weight: "bold",
+                  size: "md",
+                  wrap: true
+                },
+                {
+                  type: "text",
+                  text: "大小：" + filesize,
+                  size: "sm",
+                  color: "#666666",
+                  wrap: true
+                },
+                {
+                  type: "text",
+                  text: "有效期限：" + deadline,
+                  size: "sm",
+                  color: "#666666",
+                  wrap: true
+                }
               ]
             },
             footer: {
@@ -72,7 +96,7 @@
                   height: "sm",
                   action: {
                     type: "uri",
-                    label: "分享",
+                    label: "分享給親友",
                     uri: liff.permanentLink.createUrl()
                   }
                 }
@@ -81,15 +105,54 @@
             }
           }
         };
+
+      } else if (type === "gift") {
+        // ======= 例子：禮物分享卡片 =======
+        const title = urlParams.get("title") || "神秘禮物";
+        const img = urlParams.get("img") || "https://i.imgur.com/your_default_image.jpg";
+
+        flexMsg = {
+          type: "flex",
+          altText: "禮物來囉！",
+          contents: {
+            type: "bubble",
+            hero: {
+              type: "image",
+              url: img,
+              size: "full",
+              aspectRatio: "1:1",
+              aspectMode: "cover"
+            },
+            body: {
+              type: "box",
+              layout: "vertical",
+              contents: [
+                {
+                  type: "text",
+                  text: title,
+                  weight: "bold",
+                  size: "xl",
+                  align: "center"
+                }
+              ]
+            }
+          }
+        };
+
+      } else {
+        alert("未知的分享類型！");
+        window.close();
+        return;
       }
 
-      if (liff.isApiAvailable('shareTargetPicker')) {
+      if (liff.isApiAvailable('shareTargetPicker') && flexMsg) {
         await liff.shareTargetPicker([flexMsg]);
         liff.closeWindow();
       } else {
-        alert("此裝置不支援分享功能");
+        alert("此裝置不支援分享功能或Flex格式錯誤");
       }
     }
+
     main();
   </script>
 </body>
