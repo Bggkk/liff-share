@@ -9,13 +9,13 @@
   <h3>正在準備分享卡片...</h3>
   <script>
     async function main() {
-      await liff.init({ liffId: "2007303884-g2wdGNQ4" });
+      await liff.init({ liffId: "https://liff.line.me/2007303884-g2wdGNQ4" });
 
       const urlParams = new URLSearchParams(window.location.search);
       const type = urlParams.get("type");
 
       if (!type) {
-        alert("缺少類型參數，請從機器人按正確的分享按鈕進來");
+        alert("缺少參數");
         window.close();
         return;
       }
@@ -23,17 +23,10 @@
       let flexMsg = null;
 
       if (type === "gigafile") {
-        // ======= GigaFile 分享卡片 =======
-        const filename = urlParams.get("filename");
-        const filesize = urlParams.get("filesize");
-        const deadline = urlParams.get("deadline");
-        const fileurl = urlParams.get("url");
-
-        if (!filename || !filesize || !deadline || !fileurl) {
-          alert("缺少GigaFile參數，請從正確按鈕進來");
-          window.close();
-          return;
-        }
+        const filename = urlParams.get("filename") || "未知";
+        const filesize = urlParams.get("filesize") || "未知";
+        const deadline = urlParams.get("deadline") || "未知";
+        const fileurl = urlParams.get("url") || "#";
 
         flexMsg = {
           type: "flex",
@@ -52,27 +45,9 @@
               layout: "vertical",
               spacing: "sm",
               contents: [
-                {
-                  type: "text",
-                  text: filename,
-                  weight: "bold",
-                  size: "md",
-                  wrap: true
-                },
-                {
-                  type: "text",
-                  text: "大小：" + filesize,
-                  size: "sm",
-                  color: "#666666",
-                  wrap: true
-                },
-                {
-                  type: "text",
-                  text: "有效期限：" + deadline,
-                  size: "sm",
-                  color: "#666666",
-                  wrap: true
-                }
+                { type: "text", text: filename, weight: "bold", size: "md", wrap: true },
+                { type: "text", text: "大小：" + filesize, size: "sm", color: "#666666", wrap: true },
+                { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#666666", wrap: true }
               ]
             },
             footer: {
@@ -96,7 +71,7 @@
                   height: "sm",
                   action: {
                     type: "uri",
-                    label: "分享給親友",
+                    label: "分享",
                     uri: liff.permanentLink.createUrl()
                   }
                 }
@@ -105,55 +80,61 @@
             }
           }
         };
+      }
 
-      } else if (type === "gift") {
-        // ======= 例子：禮物分享卡片 =======
-        const title = urlParams.get("title") || "神秘禮物";
-        const img = urlParams.get("img") || "https://i.imgur.com/your_default_image.jpg";
+      else if (type === "gas") {
+        const update = urlParams.get("update") || "未知";
+        const time = urlParams.get("time") || "未知";
+        const change = urlParams.get("change") || "無資料";
 
         flexMsg = {
           type: "flex",
-          altText: "禮物來囉！",
+          altText: "油價資訊分享",
           contents: {
             type: "bubble",
-            hero: {
-              type: "image",
-              url: img,
-              size: "full",
-              aspectRatio: "1:1",
-              aspectMode: "cover"
-            },
             body: {
               type: "box",
               layout: "vertical",
+              spacing: "sm",
+              contents: [
+                { type: "text", text: "【油價資訊】", weight: "bold", size: "xl", margin: "md" },
+                { type: "text", text: `公告日期：${update}`, size: "sm", color: "#888888" },
+                { type: "text", text: `更新時間：${time}`, size: "sm", color: "#888888" },
+                { type: "text", text: `調整幅度：${change}`, size: "sm", color: "#d0021b" }
+              ]
+            },
+            footer: {
+              type: "box",
+              layout: "vertical",
+              spacing: "sm",
               contents: [
                 {
-                  type: "text",
-                  text: title,
-                  weight: "bold",
-                  size: "xl",
-                  align: "center"
+                  type: "button",
+                  style: "primary",
+                  height: "sm",
+                  action: {
+                    type: "uri",
+                    label: "分享油價卡片",
+                    uri: liff.permanentLink.createUrl()
+                  }
                 }
-              ]
+              ],
+              flex: 0
             }
           }
         };
-
-      } else {
-        alert("未知的分享類型！");
-        window.close();
-        return;
       }
 
-      if (liff.isApiAvailable('shareTargetPicker') && flexMsg) {
-        await liff.shareTargetPicker([flexMsg]);
-        liff.closeWindow();
-      } else {
-        alert("此裝置不支援分享功能或Flex格式錯誤");
+      if (flexMsg) {
+        if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flexMsg]);
+          liff.closeWindow();
+        } else {
+          alert("此裝置不支援分享功能");
+        }
       }
     }
-
     main();
   </script>
 </body>
-</html> 
+</html>
