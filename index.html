@@ -107,39 +107,6 @@
         };
       }
       // ------------------------ 以後新增別的分享系統（範例） ------------------------
-      else if (type === "gift") {
-        const title = urlParams.get("title") || "神秘禮物";
-        const img = urlParams.get("img") || "https://i.imgur.com/your_default_image.jpg";
-
-        flexMsg = {
-          type: "flex",
-          altText: "禮物來囉！",
-          contents: {
-            type: "bubble",
-            hero: {
-              type: "image",
-              url: img,
-              size: "full",
-              aspectRatio: "1:1",
-              aspectMode: "cover"
-            },
-            body: {
-              type: "box",
-              layout: "vertical",
-              contents: [
-                {
-                  type: "text",
-                  text: title,
-                  weight: "bold",
-                  size: "xl",
-                  align: "center"
-                }
-              ]
-            }
-          }
-        };
-      }
-      // ------------------------ 沒有對應的分享類型 ------------------------
 else if (type === "gas") {
     const update = urlParams.get("update") || "未知";
     const time = urlParams.get("time") || "未知";
@@ -151,8 +118,13 @@ else if (type === "gas") {
     const diesel = urlParams.get("diesel") || "N/A";
     const gas = urlParams.get("gas") || "N/A";
 
-    // 分享網址，自己組完整
-    const shareUrl = `https://liff.line.me/你的liffid?type=gas&update=${encodeURIComponent(update)}&time=${encodeURIComponent(time)}&change=${encodeURIComponent(change)}&p92=${encodeURIComponent(p92)}&p95=${encodeURIComponent(p95)}&p98=${encodeURIComponent(p98)}&alcohol=${encodeURIComponent(alcohol)}&diesel=${encodeURIComponent(diesel)}&gas=${encodeURIComponent(gas)}`;
+    // 這裡組長網址
+    const longUrl = `https://liff.line.me/你的liffid?type=gas&update=${encodeURIComponent(update)}&time=${encodeURIComponent(time)}&change=${encodeURIComponent(change)}&p92=${encodeURIComponent(p92)}&p95=${encodeURIComponent(p95)}&p98=${encodeURIComponent(p98)}&alcohol=${encodeURIComponent(alcohol)}&diesel=${encodeURIComponent(diesel)}&gas=${encodeURIComponent(gas)}`;
+
+    // 這裡用 TinyURL API 轉成短網址
+    const tinyUrl = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)`)
+        .then(res => res.text())
+        .catch(() => longUrl); // 如果失敗就用原網址
 
     flexMsg = {
         type: "flex",
@@ -192,7 +164,7 @@ else if (type === "gas") {
                         action: {
                             type: "uri",
                             label: "分享油價卡片",
-                            uri: shareUrl
+                            uri: tinyUrl
                         }
                     }
                 ]
