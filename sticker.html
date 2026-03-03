@@ -2,7 +2,6 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>GIF 分享</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
@@ -10,17 +9,17 @@
 <script>
 async function main() {
 
-  await liff.init({ liffId: "2009302184-eNP2fK7W" });
+  await liff.init({ liffId: "你的LIFF_ID" });
 
   const urlParams = new URLSearchParams(window.location.search);
   const gifUrl = urlParams.get("url");
 
   if (!gifUrl) {
-    alert("缺少 GIF 網址");
+    alert("缺少圖片網址");
     return;
   }
 
-  await liff.shareTargetPicker([
+  await liff.sendMessages([
     {
       type: "image",
       originalContentUrl: gifUrl,
