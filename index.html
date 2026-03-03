@@ -6,9 +6,11 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <h3>正在準備分享卡片...</h3>
+  <h3>正在準備中...</h3>
+
   <script>
     async function main() {
+
       await liff.init({ liffId: "2007303884-g2wdGNQ4" });
 
       const urlParams = new URLSearchParams(window.location.search);
@@ -16,14 +18,41 @@
 
       if (!type) {
         alert("缺少類型參數！");
-        window.close();
+        return;
+      }
+
+      // ==============================
+      // 🔥 貼圖模式（不分享，只顯示）
+      // ==============================
+      if (type === "sticker") {
+
+        const imgUrl = urlParams.get("img");
+
+        if (!imgUrl) {
+          alert("缺少圖片參數");
+          return;
+        }
+
+        document.body.innerHTML = "";
+        document.body.style.margin = "0";
+        document.body.style.background = "#000";
+
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.style.width = "100%";
+        img.style.display = "block";
+
+        document.body.appendChild(img);
         return;
       }
 
       let flexMsg = null;
 
+      // ==============================
+      // GigaFile 分享
+      // ==============================
       if (type === "gigafile") {
-        // GigaFile分享邏輯
+
         const filename = urlParams.get("filename") || "未知";
         const filesize = urlParams.get("filesize") || "未知";
         const deadline = urlParams.get("deadline") || "未知";
@@ -47,8 +76,8 @@
               spacing: "sm",
               contents: [
                 { type: "text", text: filename, weight: "bold", size: "md", wrap: true },
-                { type: "text", text: "大小：" + filesize, size: "sm", color: "#666666", wrap: true },
-                { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#666666", wrap: true }
+                { type: "text", text: "大小：" + filesize, size: "sm", color: "#666666" },
+                { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#666666" }
               ]
             },
             footer: {
@@ -59,7 +88,6 @@
                 {
                   type: "button",
                   style: "primary",
-                  height: "sm",
                   action: {
                     type: "uri",
                     label: "點進網頁",
@@ -69,22 +97,23 @@
                 {
                   type: "button",
                   style: "secondary",
-                  height: "sm",
                   action: {
                     type: "uri",
                     label: "分享",
                     uri: liff.permanentLink.createUrl()
                   }
                 }
-              ],
-              flex: 0
+              ]
             }
           }
         };
       }
 
+      // ==============================
+      // 油價分享
+      // ==============================
       else if (type === "gas") {
-        // 油價分享邏輯
+
         const update = urlParams.get("update") || "未知";
         const time = urlParams.get("time") || "未知";
         const change = urlParams.get("change") || "無資料";
@@ -106,57 +135,48 @@
               layout: "vertical",
               spacing: "sm",
               contents: [
-                { type: "text", text: "【油價資訊】", weight: "bold", size: "xl", margin: "md" },
+                { type: "text", text: "【油價資訊】", weight: "bold", size: "xl" },
                 { type: "text", text: `公告日期：${update}`, size: "sm", color: "#888888" },
                 { type: "text", text: `查看時間：${time}`, size: "sm", color: "#888888" },
                 { type: "text", text: `調整幅度：${change}`, size: "sm", color: "#d0021b" },
                 { type: "separator", margin: "md" },
-                {
-                  type: "box",
-                  layout: "vertical",
-                  spacing: "sm",
-                  margin: "md",
-                  contents: [
-                    { type: "text", text: `92無鉛：${p92} 元`, size: "md" },
-                    { type: "text", text: `95無鉛：${p95} 元`, size: "md" },
-                    { type: "text", text: `98無鉛：${p98} 元`, size: "md" },
-                    { type: "text", text: `酒精汽油：${alcohol} 元`, size: "md" },
-                    { type: "text", text: `超級柴油：${diesel} 元`, size: "md" },
-                    { type: "text", text: `液化石油氣：${gas} 元`, size: "md" },
-                    { type: "text", text: `BOT作者：小楓`, size: "md" }
-                  ]
-                }
+                { type: "text", text: `92無鉛：${p92} 元` },
+                { type: "text", text: `95無鉛：${p95} 元` },
+                { type: "text", text: `98無鉛：${p98} 元` },
+                { type: "text", text: `酒精汽油：${alcohol} 元` },
+                { type: "text", text: `超級柴油：${diesel} 元` },
+                { type: "text", text: `液化石油氣：${gas} 元` },
+                { type: "text", text: `BOT作者：小楓` }
               ]
             },
             footer: {
               type: "box",
               layout: "vertical",
-              spacing: "sm",
               contents: [
                 {
                   type: "button",
                   style: "primary",
-                  height: "sm",
                   action: {
                     type: "uri",
                     label: "分享油價卡片",
                     uri: liff.permanentLink.createUrl()
                   }
                 }
-              ],
-              flex: 0
+              ]
             }
           }
         };
       }
 
-      if (liff.isApiAvailable('shareTargetPicker')) {
+      // ==============================
+      // 分享功能（只有 gas / gigafile 會跑到這）
+      // ==============================
+      if (flexMsg && liff.isApiAvailable('shareTargetPicker')) {
         await liff.shareTargetPicker([flexMsg]);
         liff.closeWindow();
-      } else {
-        alert("此裝置不支援分享功能");
       }
     }
+
     main();
   </script>
 </body>
