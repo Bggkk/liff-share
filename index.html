@@ -1,163 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-  <title>卡片分享</title>
-  <meta charset="UTF-8">
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡片分享助手</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        /* 頁面美化與載入動畫 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00B900;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h3 { margin: 0; font-size: 18px; color: #555; }
+        p { font-size: 14px; color: #999; margin-top: 8px; }
+    </style>
 </head>
 <body>
-  <h3>正在準備分享卡片...</h3>
-  <script>
-    async function main() {
-      await liff.init({ liffId: "2007303884-g2wdGNQ4" });
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const type = urlParams.get("type");
+    <div class="container">
+        <div class="loader"></div>
+        <h3 id="status_title">正在準備分享卡片...</h3>
+        <p id="status_desc">請稍候，正在構建精美 Flex 佈局</p>
+    </div>
 
-      if (!type) {
-        alert("缺少類型參數！");
-        window.close();
-        return;
-      }
+    <script>
+        async function main() {
+            try {
+                // 1. 初始化 LIFF (使用你的 LIFF ID)
+                await liff.init({ liffId: "2007303884-g2wdGNQ4" });
 
-      let flexMsg = null;
-
-      if (type === "gigafile") {
-        // GigaFile分享邏輯
-        const filename = urlParams.get("filename") || "未知";
-        const filesize = urlParams.get("filesize") || "未知";
-        const deadline = urlParams.get("deadline") || "未知";
-        const fileurl = urlParams.get("url") || "#";
-
-        flexMsg = {
-          type: "flex",
-          altText: "GigaFile 影片",
-          contents: {
-            type: "bubble",
-            hero: {
-              type: "image",
-              url: "https://i.imgur.com/suPTpBm.jpeg",
-              size: "full",
-              aspectRatio: "16:9",
-              aspectMode: "cover"
-            },
-            body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "sm",
-              contents: [
-                { type: "text", text: filename, weight: "bold", size: "md", wrap: true },
-                { type: "text", text: "大小：" + filesize, size: "sm", color: "#666666", wrap: true },
-                { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#666666", wrap: true }
-              ]
-            },
-            footer: {
-              type: "box",
-              layout: "vertical",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "button",
-                  style: "primary",
-                  height: "sm",
-                  action: {
-                    type: "uri",
-                    label: "點進網頁",
-                    uri: fileurl
-                  }
-                },
-                {
-                  type: "button",
-                  style: "secondary",
-                  height: "sm",
-                  action: {
-                    type: "uri",
-                    label: "分享",
-                    uri: liff.permanentLink.createUrl()
-                  }
+                // 2. 檢查登入狀態
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
                 }
-              ],
-              flex: 0
+
+                // 3. 取得網址參數
+                const urlParams = new URLSearchParams(window.location.search);
+                const type = urlParams.get("type");
+
+                if (!type) {
+                    alert("錯誤：缺少類型參數！");
+                    liff.closeWindow();
+                    return;
+                }
+
+                let flexMsg = null;
+
+                // ==========================================
+                // 類型 A：GigaFile 分享邏輯
+                // ==========================================
+                if (type === "gigafile") {
+                    const filename = urlParams.get("filename") || "未知檔案";
+                    const filesize = urlParams.get("filesize") || "未知大小";
+                    const deadline = urlParams.get("deadline") || "長期保存";
+                    const fileurl = urlParams.get("url") || "https://gigafile.nu";
+
+                    flexMsg = {
+                        type: "flex",
+                        altText: "📁 收到一個 GigaFile 檔案分享",
+                        contents: {
+                            type: "bubble",
+                            hero: {
+                                type: "image",
+                                url: "https://i.imgur.com/suPTpBm.jpeg",
+                                size: "full", aspectRatio: "16:9", aspectMode: "cover"
+                            },
+                            body: {
+                                type: "box", layout: "vertical", spacing: "md",
+                                contents: [
+                                    { type: "text", text: filename, weight: "bold", size: "lg", wrap: true },
+                                    {
+                                        type: "box", layout: "vertical", spacing: "xs",
+                                        contents: [
+                                            { type: "text", text: "檔案大小：" + filesize, size: "sm", color: "#666666" },
+                                            { type: "text", text: "有效期限：" + deadline, size: "sm", color: "#FF3B30", weight: "bold" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            footer: {
+                                type: "box", layout: "vertical", spacing: "sm",
+                                contents: [
+                                    {
+                                        type: "button", style: "primary", height: "sm", color: "#007AFF",
+                                        action: { type: "uri", label: "下載檔案", uri: fileurl }
+                                    },
+                                    {
+                                        type: "button", style: "secondary", height: "sm",
+                                        action: { type: "uri", label: "再次分享", uri: liff.permanentLink.createUrl() }
+                                    }
+                                ]
+                            }
+                        }
+                    };
+                }
+
+                // ==========================================
+                // 類型 B：油價資訊分享邏輯 (視覺強化版)
+                // ==========================================
+                else if (type === "gas") {
+                    const change = urlParams.get("change") || "無調整";
+                    // 自動判斷漲跌顏色：包含"漲"則紅，包含"跌"則綠，否則灰色
+                    const themeColor = change.includes("漲") ? "#d0021b" : change.includes("跌") ? "#28a745" : "#555555";
+                    
+                    flexMsg = {
+                        type: "flex",
+                        altText: "⛽ 今日油價快報：" + change,
+                        contents: {
+                            type: "bubble",
+                            size: "mega",
+                            header: {
+                                type: "box", layout: "vertical", backgroundColor: themeColor, paddingAll: "20px",
+                                contents: [
+                                    { type: "text", text: "⛽ 今日油價快報", color: "#ffffff", weight: "bold", size: "xl" },
+                                    { type: "text", text: "公告日期：" + (urlParams.get("update") || "N/A"), color: "#ffffffcc", size: "xs", margin: "sm" }
+                                ]
+                            },
+                            body: {
+                                type: "box", layout: "vertical", spacing: "md", paddingAll: "20px",
+                                contents: [
+                                    { type: "text", text: "價格調整：" + change, weight: "bold", size: "md", color: themeColor },
+                                    { type: "separator" },
+                                    _createGasRow("92 無鉛汽油", urlParams.get("p92")),
+                                    _createGasRow("95 無鉛汽油", urlParams.get("p95")),
+                                    _createGasRow("98 無鉛汽油", urlParams.get("p98")),
+                                    _createGasRow("超級柴油", urlParams.get("diesel")),
+                                    { type: "separator", margin: "md" },
+                                    {
+                                        type: "box", layout: "vertical", spacing: "xs",
+                                        contents: [
+                                            { type: "text", text: "查詢時間：" + (urlParams.get("time") || "N/A"), size: "xxs", color: "#aaaaaa", align: "center" },
+                                            { type: "text", text: "BOT作者：小楓", size: "xxs", color: "#aaaaaa", align: "center" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            footer: {
+                                type: "box", layout: "vertical", paddingAll: "md",
+                                contents: [
+                                    {
+                                        type: "button", style: "primary", color: themeColor, height: "sm",
+                                        action: { type: "uri", label: "轉傳好友", uri: liff.permanentLink.createUrl() }
+                                    }
+                                ]
+                            }
+                        }
+                    };
+                }
+
+                // 4. 執行分享目標選擇器 (Share Target Picker)
+                if (liff.isApiAvailable('shareTargetPicker')) {
+                    await liff.shareTargetPicker([flexMsg]);
+                    liff.closeWindow();
+                } else {
+                    alert("此裝置或版本不支援分享功能");
+                    liff.closeWindow();
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status_title').innerText = "發生錯誤";
+                document.getElementById('status_desc').innerText = error.message;
             }
-          }
-        };
-      }
+        }
 
-      else if (type === "gas") {
-        // 油價分享邏輯
-        const update = urlParams.get("update") || "未知";
-        const time = urlParams.get("time") || "未知";
-        const change = urlParams.get("change") || "無資料";
-        const p92 = urlParams.get("p92") || "N/A";
-        const p95 = urlParams.get("p95") || "N/A";
-        const p98 = urlParams.get("p98") || "N/A";
-        const alcohol = urlParams.get("alcohol") || "N/A";
-        const diesel = urlParams.get("diesel") || "N/A";
-        const gas = urlParams.get("gas") || "N/A";
+        // 輔助函式：快速建立油價橫列佈局
+        function _createGasRow(label, price) {
+            return {
+                type: "box", layout: "horizontal",
+                contents: [
+                    { type: "text", text: label, size: "sm", color: "#666666" },
+                    { type: "text", text: "NT$ " + (price || "N/A"), size: "sm", weight: "bold", align: "end" }
+                ]
+            };
+        }
 
-        flexMsg = {
-          type: "flex",
-          altText: "油價資訊分享",
-          contents: {
-            type: "bubble",
-            size: "mega",
-            body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "sm",
-              contents: [
-                { type: "text", text: "【油價資訊】", weight: "bold", size: "xl", margin: "md" },
-                { type: "text", text: `公告日期：${update}`, size: "sm", color: "#888888" },
-                { type: "text", text: `查看時間：${time}`, size: "sm", color: "#888888" },
-                { type: "text", text: `調整幅度：${change}`, size: "sm", color: "#d0021b" },
-                { type: "separator", margin: "md" },
-                {
-                  type: "box",
-                  layout: "vertical",
-                  spacing: "sm",
-                  margin: "md",
-                  contents: [
-                    { type: "text", text: `92無鉛：${p92} 元`, size: "md" },
-                    { type: "text", text: `95無鉛：${p95} 元`, size: "md" },
-                    { type: "text", text: `98無鉛：${p98} 元`, size: "md" },
-                    { type: "text", text: `酒精汽油：${alcohol} 元`, size: "md" },
-                    { type: "text", text: `超級柴油：${diesel} 元`, size: "md" },
-                    { type: "text", text: `液化石油氣：${gas} 元`, size: "md" },
-                    { type: "text", text: `BOT作者：小楓`, size: "md" }
-                  ]
-                }
-              ]
-            },
-            footer: {
-              type: "box",
-              layout: "vertical",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "button",
-                  style: "primary",
-                  height: "sm",
-                  action: {
-                    type: "uri",
-                    label: "分享油價卡片",
-                    uri: liff.permanentLink.createUrl()
-                  }
-                }
-              ],
-              flex: 0
-            }
-          }
-        };
-      }
-
-      if (liff.isApiAvailable('shareTargetPicker')) {
-        await liff.shareTargetPicker([flexMsg]);
-        liff.closeWindow();
-      } else {
-        alert("此裝置不支援分享功能");
-      }
-    }
-    main();
-  </script>
+        // 啟動主程式
+        main();
+    </script>
 </body>
 </html>
